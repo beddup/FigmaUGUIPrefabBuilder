@@ -36,13 +36,7 @@ In Unity, open **Window > Package Manager**, select **Add package from git URL**
 ```text
 https://github.com/beddup/figmaclient.git
 https://github.com/beddup/figmatmpstyler.git
-https://github.com/beddup/figma-ugui-prefab-builder.git
-```
-
-You can pin a release by appending a tag, for example:
-
-```text
-https://github.com/beddup/figma-ugui-prefab-builder.git#v0.1.0
+https://github.com/beddup/FigmaUGUIPrefabBuilder.git
 ```
 
 ## Quick start
