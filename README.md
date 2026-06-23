@@ -6,6 +6,8 @@ It creates the GameObject hierarchy, reconstructs layout with `RectTransform`, a
 
 > This package is the Unity-side prefab builder. It does not currently fetch a Figma URL or infer the target prefab hierarchy by itself. The Figma raw node JSON and hierarchy JSON must be prepared before generation.
 
+> To extract raw node JSON and hierarchy JSON from Figma designs, refer to [FigmaToUGUIHierarchy](https://github.com/beddup/FigmaToUGUIHierarchy.git), which leverages AI large model semantic understanding and visual understanding to parse Figma nodes and generate the required JSON files.
+
 ## Features
 
 - Builds nested uGUI GameObjects from a custom hierarchy description.
