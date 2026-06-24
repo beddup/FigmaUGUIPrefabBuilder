@@ -36,16 +36,8 @@ namespace FigmaImporter.Editor
                 if (isParentCanvas) offset = boundingBox.GetPosition();
                 SetPosition(parentT, rectTransform, boundingBox);
                 // if (!isParentCanvas) SetConstraints(parentT, rectTransform, node.constraints);
-                ReCalNodeLayout(parentT, rectTransform, hierarchyNode);
             }
-            else
-            {
-                // 合成容器（无对应 Figma 节点）：拉伸填满父节点
-                rectTransform.anchorMin = Vector2.zero;
-                rectTransform.anchorMax = Vector2.one;
-                rectTransform.offsetMin = Vector2.zero;
-                rectTransform.offsetMax = Vector2.zero;
-            }
+            ReCalNodeLayout(parentT, rectTransform, hierarchyNode);
         }
         
         private void SetParent(RectTransform parentT, RectTransform rectTransform)
