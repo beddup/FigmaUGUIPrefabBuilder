@@ -31,15 +31,20 @@ It creates the GameObject hierarchy, reconstructs layout with `RectTransform`, a
 
 ## Installation
 
-Because the two Figma dependencies are distributed from Git, add them to the project before installing this package.
 
-In Unity, open **Window > Package Manager**, select **Add package from git URL**, and add:
+Add these lines to your project's `Packages/manifest.json`:
 
-```text
-https://github.com/beddup/figmaclient.git
-https://github.com/beddup/figmatmpstyler.git
-https://github.com/beddup/FigmaUGUIPrefabBuilder.git
+```json
+{
+  "dependencies": {
+     "com.beddup.figmatmpstyler": "https://github.com/beddup/figmatmpstyler.git", 
+     "com.beddup.figmaclient": "https://github.com/beddup/figmaclient.git",
+     "com.beddup.figma-ugui-prefab-builder":"https://github.com/beddup/FigmaUGUIPrefabBuilder.git"
+  }
+}
 ```
+
+You can also download the source code directly and import it into your Unity project.
 
 ## Quick start
 
