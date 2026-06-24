@@ -54,6 +54,51 @@ namespace FigmaImporter.Editor
             return JsonUtility.ToJson(this, prettyPrint);
         }
 
+        public UGUIPrefabNode FindDirectParent(UGUIPrefabNode node)
+        {
+            if (children == null) return null;
+            foreach (var child in children)
+            {
+                if (child == node) return this;
+                var found = child.FindDirectParent(node);
+                if (found != null) return found;
+            }
+            return null;
+        }
+        public List<UGUIPrefabNode> GetALlNodes() // make sure parent's index is smaller than its child node
+        {
+            var result = new List<UGUIPrefabNode>();
+            var queue = new Queue<UGUIPrefabNode>();
+            queue.Enqueue(this);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                result.Add(current);
+                if (current.children == null) continue;
+                foreach (var child in current.children)
+                    queue.Enqueue(child);
+            }
+            return result;
+        }
+        
+        public static void BindNode(UGUIPrefabNode rootHierarchyNode, Node rootFigmaNode)
+        {
+            var figmaNode = rootFigmaNode.FindNode(rootHierarchyNode.nodeId);
+            if (figmaNode == null && rootHierarchyNode.renderType != NodeRenderType.Container)
+            {
+                Debug.LogError($"Did not find node {rootHierarchyNode.nodeId}");   
+            }
+            rootHierarchyNode.node = figmaNode;
+            
+            if (rootHierarchyNode.children == null) return;
+            foreach (var child in rootHierarchyNode.children)
+            {
+                BindNode(child, rootFigmaNode);
+            }
+        }
+
+        #region BoundingBox
+
         public AbsoluteBoundingBox GetBoundingBox()
         {
             if (node != null)
@@ -97,7 +142,8 @@ namespace FigmaImporter.Editor
             }
         }
 
-        private static void EncapsulateBoundingBox(AbsoluteBoundingBox bounds, ref bool hasBounds, ref float minX, ref float minY, ref float maxX, ref float maxY)
+        private static void EncapsulateBoundingBox(AbsoluteBoundingBox bounds, ref bool hasBounds, ref float minX,
+            ref float minY, ref float maxX, ref float maxY)
         {
             if (bounds == null) return;
 
@@ -119,48 +165,6 @@ namespace FigmaImporter.Editor
             maxX = Mathf.Max(maxX, boundsMaxX);
             maxY = Mathf.Max(maxY, boundsMaxY);
         }
-
-        public UGUIPrefabNode FindDirectParent(UGUIPrefabNode node)
-        {
-            if (children == null) return null;
-            foreach (var child in children)
-            {
-                if (child == node) return this;
-                var found = child.FindDirectParent(node);
-                if (found != null) return found;
-            }
-            return null;
-        }
-        public List<UGUIPrefabNode> GetALlNodes() // make sure parent's index is smaller than its child node
-        {
-            var result = new List<UGUIPrefabNode>();
-            var queue = new Queue<UGUIPrefabNode>();
-            queue.Enqueue(this);
-            while (queue.Count > 0)
-            {
-                var current = queue.Dequeue();
-                result.Add(current);
-                if (current.children == null) continue;
-                foreach (var child in current.children)
-                    queue.Enqueue(child);
-            }
-            return result;
-        }
-        
-        public static void BindNode(UGUIPrefabNode rootHierarchyNode, Node rootFigmaNode)
-        {
-            var figmaNode = rootFigmaNode.FindNode(rootHierarchyNode.nodeId);
-            if (figmaNode == null && rootHierarchyNode.renderType != NodeRenderType.Container)
-            {
-                Debug.LogError($"Did not find node {rootHierarchyNode.nodeId}");   
-            }
-            rootHierarchyNode.node = figmaNode;
-            
-            if (rootHierarchyNode.children == null) return;
-            foreach (var child in rootHierarchyNode.children)
-            {
-                BindNode(child, rootFigmaNode);
-            }
-        }
+        #endregion
     }
 }
