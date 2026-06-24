@@ -27,7 +27,7 @@ namespace FigmaImporter.Editor
             { 
                 var newPool = CreateInstance<FigmaImagesLocalPool>();
                 newPool.NodesImages = new List<NodeImageItem>();
-                AssetDatabase.CreateAsset(newPool, "Assets/FigmaAssets/FigmaImagesLocalPool.asset");
+                AssetDatabase.CreateAsset(newPool, "Assets/FigmaData/FigmaImagesLocalPool.asset");
                 AssetDatabase.Refresh();
                 return newPool;
             }

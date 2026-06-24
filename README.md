@@ -122,7 +122,7 @@ A container may omit a matching Figma node. Such synthetic containers stretch to
 - Prefabs are written to `Prefab Save Folder`, defaulting to `Assets/Prefabs`.
 - Sprites are written to `Sprite Save Folder`.
 - TextMeshPro materials are written to `Material Save Folder`.
-- The sprite cache is stored as `Assets/FigmaAssets/FigmaImagesLocalPool.asset`.
+- The sprite cache is stored as `Assets/FigmaData/FigmaImagesLocalPool.asset`.
 
 The sprite cache can be inspected in Unity. It supports cleaning invalid entries, clearing records, and retrying downloads that retained a source URL.
 
