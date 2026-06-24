@@ -10,7 +10,7 @@ namespace FigmaImporter.Editor
 {
     public class FigmaNodeGameObjectGenerator
     {
-        Vector2 offset = Vector2.zero;
+        Vector2 figmaRootPosition = Vector2.zero;
         
         public void GenerateNodeGameObject(UGUIPrefabNode hierarchyNode, GameObject parent)
             // , string token, Func<Node, TMP_FontAsset> tmpFontProvider, string assetSaveFolder)
@@ -27,13 +27,11 @@ namespace FigmaImporter.Editor
             SetParent(parentT, rectTransform);
             hierarchyNode.gameObject = nodeGo;
 
-            var node = hierarchyNode.node;
-            // hierarchyNode 可能是凭空创建作为组织节点，这时就没有对应的 node
-            if (node != null)
+            var boundingBox = hierarchyNode.GetBoundingBox();
+            if (boundingBox != null)
             {
-                var boundingBox = node.absoluteBoundingBox;
                 var isParentCanvas = parent.GetComponent<Canvas>();
-                if (isParentCanvas) offset = boundingBox.GetPosition();
+                if (isParentCanvas) figmaRootPosition = boundingBox.GetPosition();
                 SetPosition(parentT, rectTransform, boundingBox);
                 // if (!isParentCanvas) SetConstraints(parentT, rectTransform, node.constraints);
             }
@@ -50,7 +48,7 @@ namespace FigmaImporter.Editor
         {
             var canvas = parent.GetComponentInParent<Canvas>();
             rectTransform.pivot = Vector2.up;
-            var newPosition = boundingBox.GetPosition() - offset;
+            var newPosition = boundingBox.GetPosition() - figmaRootPosition;
             var v = ConvertVector((RectTransform)canvas.transform, newPosition);
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, boundingBox.width);
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, boundingBox.height);

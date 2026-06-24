@@ -54,6 +54,72 @@ namespace FigmaImporter.Editor
             return JsonUtility.ToJson(this, prettyPrint);
         }
 
+        public AbsoluteBoundingBox GetBoundingBox()
+        {
+            if (node != null)
+            {
+                return node.absoluteBoundingBox;
+            }
+
+            bool hasBounds = false;
+            float minX = 0f;
+            float minY = 0f;
+            float maxX = 0f;
+            float maxY = 0f;
+
+            CollectChildrenBoundingBox(ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
+            if (!hasBounds)
+            {
+                return null;
+            }
+
+            return new AbsoluteBoundingBox
+            {
+                x = minX,
+                y = minY,
+                width = maxX - minX,
+                height = maxY - minY
+            };
+        }
+
+        private void CollectChildrenBoundingBox(ref bool hasBounds, ref float minX, ref float minY, ref float maxX, ref float maxY)
+        {
+            if (children == null) return;
+
+            foreach (var child in children)
+            {
+                if (child.node != null)
+                {
+                    EncapsulateBoundingBox(child.node.absoluteBoundingBox, ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
+                }
+
+                child.CollectChildrenBoundingBox(ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
+            }
+        }
+
+        private static void EncapsulateBoundingBox(AbsoluteBoundingBox bounds, ref bool hasBounds, ref float minX, ref float minY, ref float maxX, ref float maxY)
+        {
+            if (bounds == null) return;
+
+            var boundsMaxX = bounds.x + bounds.width;
+            var boundsMaxY = bounds.y + bounds.height;
+
+            if (!hasBounds)
+            {
+                minX = bounds.x;
+                minY = bounds.y;
+                maxX = boundsMaxX;
+                maxY = boundsMaxY;
+                hasBounds = true;
+                return;
+            }
+
+            minX = Mathf.Min(minX, bounds.x);
+            minY = Mathf.Min(minY, bounds.y);
+            maxX = Mathf.Max(maxX, boundsMaxX);
+            maxY = Mathf.Max(maxY, boundsMaxY);
+        }
+
         public UGUIPrefabNode FindDirectParent(UGUIPrefabNode node)
         {
             if (children == null) return null;
