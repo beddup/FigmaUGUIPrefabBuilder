@@ -21,8 +21,8 @@ namespace FigmaImporter.Editor
         public string gameObjectCategory;
         public string gameObjectName;
         public bool isButton;
-        public string horizontal_alignment; // left, center, or right
-        public string vertical_alignment; // top, center, or bottom
+        public string horizontal_alignment; // left, center, right, stretch
+        public string vertical_alignment; // top, center, bottom, stretch
         public List<UGUIPrefabNode> children = new List<UGUIPrefabNode>();
         [NonSerialized] public Node node;
         [NonSerialized] public GameObject gameObject;

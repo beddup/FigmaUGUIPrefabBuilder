@@ -32,7 +32,7 @@ namespace FigmaImporter.Editor
             {
                 var isParentCanvas = parent.GetComponent<Canvas>();
                 if (isParentCanvas) figmaRootPosition = boundingBox.GetPosition();
-                SetPosition(parentT, rectTransform, boundingBox);
+                SetPosition(parentT, rectTransform, boundingBox, hierarchyNode);
                 // if (!isParentCanvas) SetConstraints(parentT, rectTransform, node.constraints);
             }
             ReCalNodeLayout(parentT, rectTransform, hierarchyNode);
@@ -44,44 +44,95 @@ namespace FigmaImporter.Editor
             rectTransform.localScale = Vector3.one;
         }
         
-        private void SetPosition(RectTransform parent, RectTransform rectTransform, AbsoluteBoundingBox boundingBox)
+        // 文字节点宽度/高度的扩展比例，避免 Unity 中文字折行
+        private const float TEXT_SIZE_SCALE = 1.1f;
+
+        private void SetPosition(RectTransform parent, RectTransform rectTransform, AbsoluteBoundingBox boundingBox, UGUIPrefabNode hierarchyNode)
         {
             var canvas = parent.GetComponentInParent<Canvas>();
             rectTransform.pivot = Vector2.up;
             var newPosition = boundingBox.GetPosition() - figmaRootPosition;
             var v = ConvertVector((RectTransform)canvas.transform, newPosition);
-            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, boundingBox.width);
-            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, boundingBox.height);
+
+            float width = boundingBox.width;
+            float height = boundingBox.height;
+            if (hierarchyNode.renderType == NodeRenderType.Text)
+            {
+                width *= TEXT_SIZE_SCALE;
+                height *= TEXT_SIZE_SCALE;
+            }
+
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+            rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
 
             rectTransform.position = v;
         }
 
         private void ReCalNodeLayout(RectTransform parent, RectTransform rectTransform, UGUIPrefabNode hierarchyNode)
         {
-            if (rectTransform.anchorMin != rectTransform.anchorMax)
+            bool isHorizontalStretch = string.Equals(hierarchyNode.horizontal_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
+            bool isVerticalStretch = string.Equals(hierarchyNode.vertical_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
+
+            Vector2 newAnchorMin = rectTransform.anchorMin;
+            Vector2 newAnchorMax = rectTransform.anchorMax;
+
+            if (isHorizontalStretch)
             {
+                newAnchorMin.x = 0f;
+                newAnchorMax.x = 1f;
+            }
+            else
+            {
+                float hVal = GetHorizontalAlignmentValue(hierarchyNode.horizontal_alignment);
+                newAnchorMin.x = hVal;
+                newAnchorMax.x = hVal;
+            }
+
+            if (isVerticalStretch)
+            {
+                newAnchorMin.y = 0f;
+                newAnchorMax.y = 1f;
+            }
+            else
+            {
+                float vVal = GetVerticalAlignmentValue(hierarchyNode.vertical_alignment);
+                newAnchorMin.y = vVal;
+                newAnchorMax.y = vVal;
+            }
+
+            // If no stretch (all point anchors), use the original position-preserving recalculation
+            if (!isHorizontalStretch && !isVerticalStretch)
+            {
+                var targetAnchor = newAnchorMin; // anchorMin == anchorMax
+                var targetPivot = new Vector2(0.5f, 0.5f);
+                var currentPivotLocalPosition = rectTransform.anchoredPosition +
+                                                (rectTransform.anchorMin - Vector2.one * 0.5f) * parent.rect.size;
+                var targetPivotLocalPosition = currentPivotLocalPosition +
+                                               (targetPivot - rectTransform.pivot) * rectTransform.rect.size;
+
+                rectTransform.pivot = targetPivot;
+                rectTransform.anchorMin = targetAnchor;
+                rectTransform.anchorMax = targetAnchor;
+                rectTransform.anchoredPosition = targetPivotLocalPosition -
+                                                 (targetAnchor - Vector2.one * 0.5f) * parent.rect.size;
                 return;
             }
 
-            var targetAnchor = GetPivotAndAnchor(hierarchyNode);
-            var targetPivot = new Vector2(0.5f, 0.5f);
-            var currentPivotLocalPosition = rectTransform.anchoredPosition +
-                                            (rectTransform.anchorMin - Vector2.one * 0.5f) * parent.rect.size;
-            var targetPivotLocalPosition = currentPivotLocalPosition +
-                                           (targetPivot - rectTransform.pivot) * rectTransform.rect.size;
+            // At least one axis uses stretch: compute current edge positions in parent space,
+            // then apply new anchors and recompute offsets to maintain the same visual position.
+            Vector2 offsetMin = rectTransform.offsetMin;
+            Vector2 offsetMax = rectTransform.offsetMax;
+            Vector2 parentSize = parent.rect.size;
 
-            rectTransform.pivot = targetPivot;
-            rectTransform.anchorMin = targetAnchor;
-            rectTransform.anchorMax = targetAnchor;
-            rectTransform.anchoredPosition = targetPivotLocalPosition -
-                                             (targetAnchor - Vector2.one * 0.5f) * parent.rect.size;
-        }
+            Vector2 leftBottom = rectTransform.anchorMin * parentSize + offsetMin;
+            Vector2 rightTop = rectTransform.anchorMax * parentSize + offsetMax;
 
-        private Vector2 GetPivotAndAnchor(UGUIPrefabNode hierarchyNode)
-        {
-            return new Vector2(
-                GetHorizontalAlignmentValue(hierarchyNode.horizontal_alignment),
-                GetVerticalAlignmentValue(hierarchyNode.vertical_alignment));
+            rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchorMin = newAnchorMin;
+            rectTransform.anchorMax = newAnchorMax;
+
+            rectTransform.offsetMin = leftBottom - newAnchorMin * parentSize;
+            rectTransform.offsetMax = rightTop - newAnchorMax * parentSize;
         }
 
         private float GetHorizontalAlignmentValue(string alignment)
