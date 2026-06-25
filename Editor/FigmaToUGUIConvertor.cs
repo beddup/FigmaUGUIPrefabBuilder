@@ -68,9 +68,9 @@ namespace FigmaImporter.Editor
 
                 if (hierarchyNode.renderType == NodeRenderType.Text)
                 {
-                    if (node.type != "TEXT")
+                    if (node.type != "TEXT" && node.children.Length > 0)
                     {
-                        node = node.children.First(item => item.type != "TEXT") ?? hierarchyNode.node;
+                        node = node.children.First(item => item.type == "TEXT") ?? hierarchyNode.node;
                     }
                     var tmpFont = config.GetFont(node);
 
