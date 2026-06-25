@@ -63,17 +63,18 @@ namespace FigmaImporter.Editor
                 return;
             }
 
-            var targetPivotAndAnchor = GetPivotAndAnchor(hierarchyNode);
+            var targetAnchor = GetPivotAndAnchor(hierarchyNode);
+            var targetPivot = new Vector2(0.5f, 0.5f);
             var currentPivotLocalPosition = rectTransform.anchoredPosition +
                                             (rectTransform.anchorMin - Vector2.one * 0.5f) * parent.rect.size;
             var targetPivotLocalPosition = currentPivotLocalPosition +
-                                           (targetPivotAndAnchor - rectTransform.pivot) * rectTransform.rect.size;
+                                           (targetPivot - rectTransform.pivot) * rectTransform.rect.size;
 
-            rectTransform.pivot = targetPivotAndAnchor;
-            rectTransform.anchorMin = targetPivotAndAnchor;
-            rectTransform.anchorMax = targetPivotAndAnchor;
+            rectTransform.pivot = targetPivot;
+            rectTransform.anchorMin = targetAnchor;
+            rectTransform.anchorMax = targetAnchor;
             rectTransform.anchoredPosition = targetPivotLocalPosition -
-                                             (targetPivotAndAnchor - Vector2.one * 0.5f) * parent.rect.size;
+                                             (targetAnchor - Vector2.one * 0.5f) * parent.rect.size;
         }
 
         private Vector2 GetPivotAndAnchor(UGUIPrefabNode hierarchyNode)
