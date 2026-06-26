@@ -20,22 +20,35 @@ namespace FigmaImporter.Editor
                 throw new Exception("[FigmaImporter] Parent is null. Set the canvas reference.");
             }
 
-            // 为 Node 创建GameOjbect 
+            // 为 Node 创建GameOjbect
             GameObject nodeGo = new GameObject(hierarchyNode.gameObjectName);
             RectTransform parentT = parent.GetComponent<RectTransform>();
             RectTransform rectTransform = nodeGo.AddComponent<RectTransform>();
             SetParent(parentT, rectTransform);
             hierarchyNode.gameObject = nodeGo;
 
-            var boundingBox = hierarchyNode.GetBoundingBox();
-            if (boundingBox != null)
+            AbsoluteBoundingBox boundingBox = null;
+            var box = hierarchyNode.GetBoundingBox();
+            if (box != null)
             {
+                boundingBox = box;
                 var isParentCanvas = parent.GetComponent<Canvas>();
                 if (isParentCanvas) figmaRootPosition = boundingBox.GetPosition();
                 SetPosition(parentT, rectTransform, boundingBox, hierarchyNode);
                 // if (!isParentCanvas) SetConstraints(parentT, rectTransform, node.constraints);
             }
             ReCalNodeLayout(parentT, rectTransform, hierarchyNode);
+
+            // 文字节点在 layout 计算完成后扩大尺寸，避免 pivot 转换时引入位置偏移
+            if (hierarchyNode.renderType == NodeRenderType.Text && boundingBox != null)
+            {
+                bool isHStretch = string.Equals(hierarchyNode.horizontal_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
+                bool isVStretch = string.Equals(hierarchyNode.vertical_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
+                if (!isHStretch)
+                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, boundingBox.width * TEXT_SIZE_SCALE);
+                if (!isVStretch)
+                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, boundingBox.height * TEXT_SIZE_SCALE);
+            }
         }
         
         private void SetParent(RectTransform parentT, RectTransform rectTransform)
@@ -56,11 +69,6 @@ namespace FigmaImporter.Editor
 
             float width = boundingBox.width;
             float height = boundingBox.height;
-            if (hierarchyNode.renderType == NodeRenderType.Text)
-            {
-                width *= TEXT_SIZE_SCALE;
-                height *= TEXT_SIZE_SCALE;
-            }
 
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
             rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);

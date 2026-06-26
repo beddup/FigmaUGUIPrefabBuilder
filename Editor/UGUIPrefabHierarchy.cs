@@ -136,7 +136,21 @@ namespace FigmaImporter.Editor
             {
                 if (child.node != null)
                 {
-                    EncapsulateBoundingBox(child.node.absoluteBoundingBox, ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
+                    var box = child.node.absoluteBoundingBox;
+                    // 文字节点在 Unity 中会扩大 10%，容器边界需要同步扩展
+                    if (child.renderType == NodeRenderType.Text)
+                    {
+                        float expandW = box.width * 0.05f;
+                        float expandH = box.height * 0.05f;
+                        box = new AbsoluteBoundingBox
+                        {
+                            x = box.x - expandW,
+                            y = box.y - expandH,
+                            width = box.width + expandW * 2f,
+                            height = box.height + expandH * 2f
+                        };
+                    }
+                    EncapsulateBoundingBox(box, ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
                 }
 
                 child.CollectChildrenBoundingBox(ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
