@@ -248,6 +248,13 @@ namespace FigmaImporter.Editor
                     image = hierarchyNode.gameObject.AddComponent<Image>();
                 }
                 image.sprite = sprite;
+
+                // 根据 image_type 设置 Image 组件的填充类型
+                if (string.Equals(hierarchyNode.image_type, "sliced", StringComparison.InvariantCultureIgnoreCase))
+                    image.type = Image.Type.Sliced;
+                else if (string.Equals(hierarchyNode.image_type, "tiled", StringComparison.InvariantCultureIgnoreCase))
+                    image.type = Image.Type.Tiled;
+
                 return true;
             }
             return false;

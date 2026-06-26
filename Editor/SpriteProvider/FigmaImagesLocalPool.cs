@@ -168,6 +168,26 @@ namespace FigmaImporter.Editor
             TextureImporter textureImporter = AssetImporter.GetAtPath(spritePath) as TextureImporter;
             textureImporter.textureType = TextureImporterType.Sprite;
             textureImporter.spriteImportMode = SpriteImportMode.Single;
+
+            // 为 sliced / tiled 类型的图片设置 9-slice border
+            if (prefabNode != null &&
+                (string.Equals(prefabNode.image_type, "sliced", StringComparison.InvariantCultureIgnoreCase) ||
+                 string.Equals(prefabNode.image_type, "tiled", StringComparison.InvariantCultureIgnoreCase)))
+            {
+                var tempTex = new Texture2D(1, 1);
+                tempTex.LoadImage(data);
+                int w = tempTex.width;
+                int h = tempTex.height;
+                Object.DestroyImmediate(tempTex);
+
+                if (w > 0 && h > 0)
+                {
+                    float borderX = Mathf.Round(w * 7f / 16f);
+                    float borderY = Mathf.Round(h * 7f / 16f);
+                    textureImporter.spriteBorder = new Vector4(borderX, borderY, borderX, borderY);
+                }
+            }
+
             AssetDatabase.SaveAssets();
             AssetDatabase.ImportAsset(spritePath);
             item.guid = AssetDatabase.AssetPathToGUID(spritePath);

@@ -23,6 +23,7 @@ namespace FigmaImporter.Editor
         public bool isButton;
         public string horizontal_alignment; // left, center, right, stretch
         public string vertical_alignment; // top, center, bottom, stretch
+        public string image_type = "simple"; // simple, sliced, tiled
         public List<UGUIPrefabNode> children = new List<UGUIPrefabNode>();
         [NonSerialized] public Node node;
         [NonSerialized] public GameObject gameObject;
