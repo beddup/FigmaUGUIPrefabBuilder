@@ -180,17 +180,17 @@ namespace FigmaImporter.Editor
             tmpText.fontMaterial = matInfo.OutlineAndDropShadow ?? (matInfo.InnerShadow ?? tmpText.font.material);
 
             // alignment
-            var verticalAlignment = style.textAlignVertical;
-            var horizontalAlignment = style.textAlignHorizontal;
-            int alignment = 0;
-            alignment += (verticalAlignment == "TOP" ? 1 : 0) << 8;
-            alignment += (verticalAlignment == "CENTER" ? 1 : 0) << 9;
-            alignment += (verticalAlignment == "BOTTOM" ? 1 : 0) << 10;
-            alignment += (horizontalAlignment == "LEFT" ? 1 : 0) << 0;
-            alignment += (horizontalAlignment == "CENTER" ? 1 : 0) << 1;
-            alignment += (horizontalAlignment == "RIGHT" ? 1 : 0) << 2;
-            alignment += (horizontalAlignment == "JUSTIFIED" ? 1 : 0) << 3;
-            tmpText.alignment = (TextAlignmentOptions)alignment;
+            // var verticalAlignment = style.textAlignVertical;
+            // var horizontalAlignment = style.textAlignHorizontal;
+            // int alignment = 0;
+            // alignment += (verticalAlignment == "TOP" ? 1 : 0) << 8;
+            // alignment += (verticalAlignment == "CENTER" ? 1 : 0) << 9;
+            // alignment += (verticalAlignment == "BOTTOM" ? 1 : 0) << 10;
+            // alignment += (horizontalAlignment == "LEFT" ? 1 : 0) << 0;
+            // alignment += (horizontalAlignment == "CENTER" ? 1 : 0) << 1;
+            // alignment += (horizontalAlignment == "RIGHT" ? 1 : 0) << 2;
+            // alignment += (horizontalAlignment == "JUSTIFIED" ? 1 : 0) << 3;
+            tmpText.alignment = TextAlignmentOptions.Center;
             FontStyles fontStyle = 0;
             fontStyle |= (style.textDecoration == "UNDERLINE" ? FontStyles.Underline : 0);
             fontStyle |= (style.textDecoration == "STRIKETHROUGH" ? FontStyles.Strikethrough : 0);
@@ -207,9 +207,7 @@ namespace FigmaImporter.Editor
             switch (fills[0].renderType)
             {
                 case Fill.FillRenderType.Color:
-                    var c = fill.ToColor();
-                    c.a =  c.a * node.opacity;
-                    tmpText.color = c;
+                    tmpText.color = fill.FillColor();
                     break;
                 case Fill.FillRenderType.GRADIENT:
                     var preset = TMPColorGradientResolver.GetTextGradientColorPreset(fill, materialSaveFolder);
