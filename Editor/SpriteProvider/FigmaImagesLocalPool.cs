@@ -178,7 +178,7 @@ namespace FigmaImporter.Editor
                 tempTex.LoadImage(data);
                 int w = tempTex.width;
                 int h = tempTex.height;
-                Object.DestroyImmediate(tempTex);
+                UnityEngine.Object.DestroyImmediate(tempTex);
 
                 if (w > 0 && h > 0)
                 {
