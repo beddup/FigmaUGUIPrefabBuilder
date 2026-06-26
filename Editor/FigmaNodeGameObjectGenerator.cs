@@ -153,7 +153,9 @@ namespace FigmaImporter.Editor
         public void AddColor(Node node, GameObject nodeGo)
         {
             var image = nodeGo.AddComponent<Image>();
-            image.color = node.GetSolidFillColor();
+            var fillColor = node.GetSolidFillColor();
+            fillColor.a *= node.opacity;
+            image.color = fillColor;
         }
 
 
@@ -205,7 +207,9 @@ namespace FigmaImporter.Editor
             switch (fills[0].renderType)
             {
                 case Fill.FillRenderType.Color:
-                    tmpText.color = fill.color.ToColor();
+                    var c = fill.ToColor();
+                    c.a =  c.a * node.opacity;
+                    tmpText.color = c;
                     break;
                 case Fill.FillRenderType.GRADIENT:
                     var preset = TMPColorGradientResolver.GetTextGradientColorPreset(fill, materialSaveFolder);
