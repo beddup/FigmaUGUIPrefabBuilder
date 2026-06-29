@@ -13,7 +13,6 @@ namespace FigmaImporter.Editor
     public class FigmaPrefabResult
     {
         public string file_key;
-        public string api_token;
         public string node_name;
         public string raw_content_path;
         public string prefab_hierarchy_path;
@@ -23,7 +22,6 @@ namespace FigmaImporter.Editor
             get
             {
                 if (string.IsNullOrEmpty(file_key)) return false;
-                if (string.IsNullOrEmpty(api_token)) return false;
                 if (string.IsNullOrEmpty(raw_content_path) || !File.Exists(raw_content_path)) return false;
                 if (string.IsNullOrEmpty(prefab_hierarchy_path) || !File.Exists(prefab_hierarchy_path)) return false;
                 return true;
