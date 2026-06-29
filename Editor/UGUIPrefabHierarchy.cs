@@ -102,83 +102,77 @@ namespace FigmaImporter.Editor
 
         public AbsoluteBoundingBox GetBoundingBox()
         {
-            if (node != null)
+            var allNodes = GetALlNodes();
+            AbsoluteBoundingBox result = null;
+
+            foreach (var n in allNodes)
             {
-                return node.absoluteBoundingBox;
-            }
+                if (n.node == null) continue;
 
-            bool hasBounds = false;
-            float minX = 0f;
-            float minY = 0f;
-            float maxX = 0f;
-            float maxY = 0f;
-
-            CollectChildrenBoundingBox(ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
-            if (!hasBounds)
-            {
-                return null;
-            }
-
-            return new AbsoluteBoundingBox
-            {
-                x = minX,
-                y = minY,
-                width = maxX - minX,
-                height = maxY - minY
-            };
-        }
-
-        private void CollectChildrenBoundingBox(ref bool hasBounds, ref float minX, ref float minY, ref float maxX, ref float maxY)
-        {
-            if (children == null) return;
-
-            foreach (var child in children)
-            {
-                if (child.node != null)
+                var box = n.node.absoluteBoundingBox;
+                // 文字节点在 Unity 中会扩大 10%，扩展方向根据文字对齐方式决定
+                if (n.renderType == NodeRenderType.Text && n.node.style != null)
                 {
-                    var box = child.node.absoluteBoundingBox;
-                    // 文字节点在 Unity 中会扩大 10%，容器边界需要同步扩展
-                    if (child.renderType == NodeRenderType.Text)
+                    float expandW = box.width * 0.1f;
+                    float expandH = box.height * 0.1f;
+                    float expandLeft = 0f, expandRight = 0f, expandTop = 0f, expandBottom = 0f;
+
+                    switch (n.node.style.textAlignHorizontal)
                     {
-                        float expandW = box.width * 0.05f;
-                        float expandH = box.height * 0.05f;
-                        box = new AbsoluteBoundingBox
-                        {
-                            x = box.x - expandW,
-                            y = box.y - expandH,
-                            width = box.width + expandW * 2f,
-                            height = box.height + expandH * 2f
-                        };
+                        case "LEFT":
+                            expandRight = expandW;
+                            break;
+                        case "RIGHT":
+                            expandLeft = expandW;
+                            break;
+                        default: // CENTER, JUSTIFIED
+                            expandLeft = expandRight = expandW * 0.5f;
+                            break;
                     }
-                    EncapsulateBoundingBox(box, ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
+
+                    switch (n.node.style.textAlignVertical)
+                    {
+                        case "TOP":
+                            expandBottom = expandH;
+                            break;
+                        case "BOTTOM":
+                            expandTop = expandH;
+                            break;
+                        default: // CENTER
+                            expandTop = expandBottom = expandH * 0.5f;
+                            break;
+                    }
+
+                    box = new AbsoluteBoundingBox
+                    {
+                        x = box.x - expandLeft,
+                        y = box.y - expandTop,
+                        width = box.width + expandLeft + expandRight,
+                        height = box.height + expandTop + expandBottom
+                    };
                 }
 
-                child.CollectChildrenBoundingBox(ref hasBounds, ref minX, ref minY, ref maxX, ref maxY);
-            }
-        }
-
-        private static void EncapsulateBoundingBox(AbsoluteBoundingBox bounds, ref bool hasBounds, ref float minX,
-            ref float minY, ref float maxX, ref float maxY)
-        {
-            if (bounds == null) return;
-
-            var boundsMaxX = bounds.x + bounds.width;
-            var boundsMaxY = bounds.y + bounds.height;
-
-            if (!hasBounds)
-            {
-                minX = bounds.x;
-                minY = bounds.y;
-                maxX = boundsMaxX;
-                maxY = boundsMaxY;
-                hasBounds = true;
-                return;
+                if (result == null)
+                {
+                    result = box;
+                }
+                else
+                {
+                    var minX = Mathf.Min(result.x, box.x);
+                    var minY = Mathf.Min(result.y, box.y);
+                    var maxX = Mathf.Max(result.x + result.width, box.x + box.width);
+                    var maxY = Mathf.Max(result.y + result.height, box.y + box.height);
+                    result = new AbsoluteBoundingBox
+                    {
+                        x = minX,
+                        y = minY,
+                        width = maxX - minX,
+                        height = maxY - minY
+                    };
+                }
             }
 
-            minX = Mathf.Min(minX, bounds.x);
-            minY = Mathf.Min(minY, bounds.y);
-            maxX = Mathf.Max(maxX, boundsMaxX);
-            maxY = Mathf.Max(maxY, boundsMaxY);
+            return result;
         }
         #endregion
     }

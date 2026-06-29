@@ -27,28 +27,15 @@ namespace FigmaImporter.Editor
             SetParent(parentT, rectTransform);
             hierarchyNode.gameObject = nodeGo;
 
-            AbsoluteBoundingBox boundingBox = null;
-            var box = hierarchyNode.GetBoundingBox();
-            if (box != null)
+            var boundingBox = hierarchyNode.GetBoundingBox();
+            if (boundingBox != null)
             {
-                boundingBox = box;
                 var isParentCanvas = parent.GetComponent<Canvas>();
-                if (isParentCanvas) figmaRootPosition = boundingBox.GetPosition();
+                if (isParentCanvas) figmaRootPosition = hierarchyNode.node?.absoluteBoundingBox?.GetPosition() ?? boundingBox.GetPosition();
+
                 SetPosition(parentT, rectTransform, boundingBox, hierarchyNode);
-                // if (!isParentCanvas) SetConstraints(parentT, rectTransform, node.constraints);
             }
             ReCalNodeLayout(parentT, rectTransform, hierarchyNode);
-
-            // 文字节点在 layout 计算完成后扩大尺寸，避免 pivot 转换时引入位置偏移
-            if (hierarchyNode.renderType == NodeRenderType.Text && boundingBox != null)
-            {
-                bool isHStretch = string.Equals(hierarchyNode.horizontal_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
-                bool isVStretch = string.Equals(hierarchyNode.vertical_alignment, "stretch", StringComparison.InvariantCultureIgnoreCase);
-                if (!isHStretch)
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, boundingBox.width * TEXT_SIZE_SCALE);
-                if (!isVStretch)
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, boundingBox.height * TEXT_SIZE_SCALE);
-            }
         }
         
         private void SetParent(RectTransform parentT, RectTransform rectTransform)
@@ -57,9 +44,6 @@ namespace FigmaImporter.Editor
             rectTransform.localScale = Vector3.one;
         }
         
-        // 文字节点宽度/高度的扩展比例，避免 Unity 中文字折行
-        private const float TEXT_SIZE_SCALE = 1.1f;
-
         private void SetPosition(RectTransform parent, RectTransform rectTransform, AbsoluteBoundingBox boundingBox, UGUIPrefabNode hierarchyNode)
         {
             var canvas = parent.GetComponentInParent<Canvas>();
@@ -188,17 +172,17 @@ namespace FigmaImporter.Editor
             tmpText.fontMaterial = matInfo.OutlineAndDropShadow ?? (matInfo.InnerShadow ?? tmpText.font.material);
 
             // alignment
-            // var verticalAlignment = style.textAlignVertical;
-            // var horizontalAlignment = style.textAlignHorizontal;
-            // int alignment = 0;
-            // alignment += (verticalAlignment == "TOP" ? 1 : 0) << 8;
-            // alignment += (verticalAlignment == "CENTER" ? 1 : 0) << 9;
-            // alignment += (verticalAlignment == "BOTTOM" ? 1 : 0) << 10;
-            // alignment += (horizontalAlignment == "LEFT" ? 1 : 0) << 0;
-            // alignment += (horizontalAlignment == "CENTER" ? 1 : 0) << 1;
-            // alignment += (horizontalAlignment == "RIGHT" ? 1 : 0) << 2;
-            // alignment += (horizontalAlignment == "JUSTIFIED" ? 1 : 0) << 3;
-            tmpText.alignment = TextAlignmentOptions.Center;
+            var verticalAlignment = style.textAlignVertical;
+            var horizontalAlignment = style.textAlignHorizontal;
+            int alignment = 0;
+            alignment += (verticalAlignment == "TOP" ? 1 : 0) << 8;
+            alignment += (verticalAlignment == "CENTER" ? 1 : 0) << 9;
+            alignment += (verticalAlignment == "BOTTOM" ? 1 : 0) << 10;
+            alignment += (horizontalAlignment == "LEFT" ? 1 : 0) << 0;
+            alignment += (horizontalAlignment == "CENTER" ? 1 : 0) << 1;
+            alignment += (horizontalAlignment == "RIGHT" ? 1 : 0) << 2;
+            alignment += (horizontalAlignment == "JUSTIFIED" ? 1 : 0) << 3;
+            tmpText.alignment = (TextAlignmentOptions)alignment;
             FontStyles fontStyle = 0;
             fontStyle |= (style.textDecoration == "UNDERLINE" ? FontStyles.Underline : 0);
             fontStyle |= (style.textDecoration == "STRIKETHROUGH" ? FontStyles.Strikethrough : 0);
@@ -280,76 +264,6 @@ namespace FigmaImporter.Editor
             else
                 nodeGo.AddComponent<Mask>();
         }
-
-        private void SetConstraints(RectTransform parentTransform, RectTransform rectTransform,
-            Constraints nodeConstraints)
-        {
-            Vector2 offsetMin = rectTransform.offsetMin;
-            Vector2 offsetMax = rectTransform.offsetMax;
-            var parentSize = parentTransform.rect.size;
-            Vector2 positionMin = Vector2.Scale(rectTransform.anchorMin, parentSize) + offsetMin;
-            Vector2 positionMax = Vector2.Scale(rectTransform.anchorMax, parentSize) + offsetMax;
-
-            var width = rectTransform.rect.width;
-            var height = rectTransform.rect.height;
-            Vector3 minAnchor = Vector2.one / 2f;
-            Vector3 maxAnchor = Vector2.one / 2f;
-
-            switch (nodeConstraints.horizontal)
-            {
-                case "LEFT_RIGHT":
-                    minAnchor.x = 0f;
-                    maxAnchor.x = 1f;
-                    break;
-                case "LEFT":
-                    minAnchor.x = maxAnchor.x = 0f;
-                    break;
-                case "RIGHT":
-                    minAnchor.x = maxAnchor.x = 1f;
-                    break;
-                case "CENTER":
-                    minAnchor.x = maxAnchor.x = 0.5f;
-                    break;
-                case "SCALE":
-                    minAnchor.x = rectTransform.anchorMin.x + rectTransform.offsetMin.x / parentTransform.rect.width;
-                    maxAnchor.x = rectTransform.anchorMax.x + rectTransform.offsetMax.x / parentTransform.rect.width;
-                    break;
-                default:
-                    Debug.LogError($"Unknown horizontal constraint {nodeConstraints.horizontal}");
-                    break;
-            }
-
-            switch (nodeConstraints.vertical)
-            {
-                case "TOP_BOTTOM":
-                    minAnchor.y = 0f;
-                    maxAnchor.y = 1f;
-                    break;
-                case "BOTTOM":
-                    minAnchor.y = maxAnchor.y = 0f;
-                    break;
-                case "TOP":
-                    minAnchor.y = maxAnchor.y = 1f;
-                    break;
-                case "CENTER":
-                    minAnchor.y = maxAnchor.y = 0.5f;
-                    break;
-                case "SCALE":
-                    minAnchor.y = rectTransform.anchorMin.y + rectTransform.offsetMin.y / parentTransform.rect.height;
-                    maxAnchor.y = rectTransform.anchorMax.y + rectTransform.offsetMax.y / parentTransform.rect.height;
-                    break;
-                default:
-                    Debug.LogError($"Unknown horizontal constraint {nodeConstraints.horizontal}");
-                    break;
-            }
-
-            rectTransform.anchorMin = minAnchor;
-            rectTransform.anchorMax = maxAnchor;
-
-            rectTransform.offsetMin = positionMin - Vector2.Scale(rectTransform.anchorMin, parentSize);
-            rectTransform.offsetMax = positionMax - Vector2.Scale(rectTransform.anchorMax, parentSize);
-        }
-
 
         private Vector3 ConvertVector(RectTransform parent, Vector3 anchoredPosition)
         {
