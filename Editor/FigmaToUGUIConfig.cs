@@ -110,7 +110,7 @@ namespace FigmaImporter.Editor
 
                         string raw = File.ReadAllText(r.raw_content_path);
                         string hierarchy = File.ReadAllText(r.prefab_hierarchy_path);
-                        await FigmaToUGUIConvertor.ConvertFigmaToUGUIPrefab(config, r.file_key, r.api_token, raw, hierarchy);
+                        await FigmaToUGUIConvertor.ConvertFigmaToUGUIPrefab(config, r.file_key, config.FigmaAPIToken, raw, hierarchy);
                         succeeded++;
                     }
                     catch (Exception ex)
@@ -146,6 +146,7 @@ namespace FigmaImporter.Editor
 
         [SerializeField] private List<FigmaFontItem> FontItems;
         [SerializeField] public string MaterialSaveFolder;
+        [SerializeField] public string FigmaAPIToken;
         [SerializeField] public string SpriteSaveFolder;
         [SerializeField] public string PrefabSaveFolder = "Assets/Prefabs";
         
