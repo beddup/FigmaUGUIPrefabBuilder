@@ -67,14 +67,13 @@ Each TextAsset in `Figma Pages` describes one generation job:
 ```json
 {
   "file_key": "FIGMA_FILE_KEY",
-  "api_token": "FIGMA_PERSONAL_ACCESS_TOKEN",
   "node_name": "ExamplePanel",
   "raw_content_path": "Library/FigmaToUGUI/ExamplePanel/raw.json",
   "prefab_hierarchy_path": "Library/FigmaToUGUI/ExamplePanel/prefab_hierarchy.json"
 }
 ```
 
-The referenced paths are read from the local project when generation starts. Do not commit access tokens or private design data to a public repository.
+The referenced paths are read from the local project when generation starts.
 
 ## Prefab hierarchy format
 
