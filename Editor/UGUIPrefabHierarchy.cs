@@ -14,6 +14,13 @@ namespace FigmaImporter.Editor
     }
 
     [Serializable]
+    public class TextAlignmentInfo
+    {
+        public string horizontal; // left, center, right
+        public string vertical;   // top, middle, bottom
+    }
+
+    [Serializable]
     public class UGUIPrefabNode
     {
         public string nodeId;
@@ -24,6 +31,8 @@ namespace FigmaImporter.Editor
         public string horizontal_alignment; // left, center, right, stretch
         public string vertical_alignment; // top, center, bottom, stretch
         public string image_type = "simple"; // simple, sliced, tiled
+        public AbsoluteBoundingBox text_rect;       // 文字显示区域，仅 text 类型节点有效
+        public TextAlignmentInfo text_alignment;    // 文字对齐方式，仅 text 类型节点有效
         public List<UGUIPrefabNode> children = new List<UGUIPrefabNode>();
         [NonSerialized] public Node node;
         [NonSerialized] public GameObject gameObject;
@@ -110,46 +119,53 @@ namespace FigmaImporter.Editor
                 if (n.node == null) continue;
 
                 var box = n.node.absoluteBoundingBox;
-                // 文字节点在 Unity 中会扩大 10%，扩展方向根据文字对齐方式决定
-                if (n.renderType == NodeRenderType.Text && n.node.style != null)
+                // 文字节点：优先使用 hierarchy 数据中的 text_rect，否则按之前的方式扩大 10%
+                if (n.renderType == NodeRenderType.Text)
                 {
-                    float expandW = box.width * 0.1f;
-                    float expandH = box.height * 0.1f;
-                    float expandLeft = 0f, expandRight = 0f, expandTop = 0f, expandBottom = 0f;
-
-                    switch (n.node.style.textAlignHorizontal)
+                    if (n.text_rect != null)
                     {
-                        case "LEFT":
-                            expandRight = expandW;
-                            break;
-                        case "RIGHT":
-                            expandLeft = expandW;
-                            break;
-                        default: // CENTER, JUSTIFIED
-                            expandLeft = expandRight = expandW * 0.5f;
-                            break;
+                        box = n.text_rect;
                     }
-
-                    switch (n.node.style.textAlignVertical)
+                    else if (n.node.style != null)
                     {
-                        case "TOP":
-                            expandBottom = expandH;
-                            break;
-                        case "BOTTOM":
-                            expandTop = expandH;
-                            break;
-                        default: // CENTER
-                            expandTop = expandBottom = expandH * 0.5f;
-                            break;
+                        float expandW = box.width * 0.1f;
+                        float expandH = box.height * 0.1f;
+                        float expandLeft = 0f, expandRight = 0f, expandTop = 0f, expandBottom = 0f;
+
+                        switch (n.node.style.textAlignHorizontal)
+                        {
+                            case "LEFT":
+                                expandRight = expandW;
+                                break;
+                            case "RIGHT":
+                                expandLeft = expandW;
+                                break;
+                            default: // CENTER, JUSTIFIED
+                                expandLeft = expandRight = expandW * 0.5f;
+                                break;
+                        }
+
+                        switch (n.node.style.textAlignVertical)
+                        {
+                            case "TOP":
+                                expandBottom = expandH;
+                                break;
+                            case "BOTTOM":
+                                expandTop = expandH;
+                                break;
+                            default: // CENTER
+                                expandTop = expandBottom = expandH * 0.5f;
+                                break;
+                        }
+
+                        box = new AbsoluteBoundingBox
+                        {
+                            x = box.x - expandLeft,
+                            y = box.y - expandTop,
+                            width = box.width + expandLeft + expandRight,
+                            height = box.height + expandTop + expandBottom
+                        };
                     }
-
-                    box = new AbsoluteBoundingBox
-                    {
-                        x = box.x - expandLeft,
-                        y = box.y - expandTop,
-                        width = box.width + expandLeft + expandRight,
-                        height = box.height + expandTop + expandBottom
-                    };
                 }
 
                 if (result == null)

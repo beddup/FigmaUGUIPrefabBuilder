@@ -74,7 +74,7 @@ namespace FigmaImporter.Editor
                     }
                     var tmpFont = config.GetFont(node);
 
-                    generator.AddText(node, gameObject, tmpFont, config.MaterialSaveFolder);
+                    generator.AddText(node, gameObject, tmpFont, config.MaterialSaveFolder, hierarchyNode.text_alignment);
                 }
 
                 if (hierarchyNode.isButton)

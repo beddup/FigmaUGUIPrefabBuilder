@@ -151,19 +151,19 @@ namespace FigmaImporter.Editor
         }
 
 
-        public void AddText(Node node, GameObject nodeGo, TMP_FontAsset tmpFont, string materialSaveFolder)
+        public void AddText(Node contentNode, GameObject nodeGo, TMP_FontAsset tmpFont, string materialSaveFolder, TextAlignmentInfo textAlignment = null)
         {
             var tmpText = nodeGo.AddComponent<TextMeshProUGUI>();
-            tmpText.text = node.characters;
+            tmpText.text = contentNode.characters;
 
-            var matInfo = TMPMaterialProvider.GetTMPMaterial(node, tmpFont, materialSaveFolder, false);
+            var matInfo = TMPMaterialProvider.GetTMPMaterial(contentNode, tmpFont, materialSaveFolder, false);
             if (matInfo == null)
             {
-                Debug.LogError($"[Figma Importer] cannot find font for node {node.name}({node.id})");
+                Debug.LogError($"[Figma Importer] cannot find font for node {contentNode.name}({contentNode.id})");
                 return;
             }
             
-            var style = node.style;
+            var style = contentNode.style;
 
             tmpText.font = matInfo.Font;
             tmpText.fontSize = style.fontSize;
@@ -171,9 +171,21 @@ namespace FigmaImporter.Editor
 
             tmpText.fontMaterial = matInfo.OutlineAndDropShadow ?? (matInfo.InnerShadow ?? tmpText.font.material);
 
-            // alignment
-            var verticalAlignment = style.textAlignVertical;
-            var horizontalAlignment = style.textAlignHorizontal;
+            // alignment：优先使用 hierarchy 数据中的 text_alignment，否则使用 Figma style
+            string verticalAlignment;
+            string horizontalAlignment;
+            if (textAlignment != null)
+            {
+                horizontalAlignment = textAlignment.horizontal?.ToUpper();
+                verticalAlignment = textAlignment.vertical?.ToUpper();
+                // "middle" → "CENTER"
+                if (verticalAlignment == "MIDDLE") verticalAlignment = "CENTER";
+            }
+            else
+            {
+                verticalAlignment = style.textAlignVertical;
+                horizontalAlignment = style.textAlignHorizontal;
+            }
             int alignment = 0;
             alignment += (verticalAlignment == "TOP" ? 1 : 0) << 8;
             alignment += (verticalAlignment == "CENTER" ? 1 : 0) << 9;
@@ -193,8 +205,8 @@ namespace FigmaImporter.Editor
             tmpText.fontStyle = fontStyle;
             
             // color
-            var fills = node.GetValidFills();
-            if (fills.Count > 1) Debug.LogError($"[Figma Importer] Text node {node.name}({node.id} has multiple fill, which is not supported.");
+            var fills = contentNode.GetValidFills();
+            if (fills.Count > 1) Debug.LogError($"[Figma Importer] Text node {contentNode.name}({contentNode.id} has multiple fill, which is not supported.");
             var fill = fills[0];
             switch (fills[0].renderType)
             {
@@ -207,7 +219,7 @@ namespace FigmaImporter.Editor
                     tmpText.colorGradientPreset = preset;
                     break;
                 default:
-                    Debug.LogError($"[Figma Importer] do not support fill type {fills[0].renderType} in Text node {node.name}({node.id}");
+                    Debug.LogError($"[Figma Importer] do not support fill type {fills[0].renderType} in Text node {contentNode.name}({contentNode.id}");
                     break;
             }
             

@@ -163,7 +163,7 @@ namespace FigmaImporter.Editor
             });
             if (fontItem == null)
             {
-                Debug.LogError($"[Figma Importer] cannot find TMP Font Asset for node {textNode.name} (id:{textNode.id})");
+                Debug.LogError($"[Figma Importer] cannot find TMP Font Asset for node {textNode.name} (id:{textNode.id}): font name :{style.fontFamily}. font weight :{style.fontWeight}, font style:{style.fontPostScriptName}");
             }
             return fontItem?.Font;
         }
