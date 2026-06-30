@@ -11,8 +11,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "com.beddup.figmaclient": "0.0.1",
-    "com.beddup.figmatmpstyler": "0.0.1",
+    "com.beddup.figmaclient":"https://github.com/beddup/figmaclient.git#main",
+    "com.beddup.figmatmpstyler":"https://github.com/beddup/FigmaTMPStyler.git#main",
     "com.unity.textmeshpro": "3.0.9"
   },
   "keywords": [
