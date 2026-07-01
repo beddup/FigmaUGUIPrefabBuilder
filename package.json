@@ -1,7 +1,7 @@
 {
   "name": "com.beddup.figma-ugui-prefab-builder",
   "displayName": "Figma uGUI Prefab Builder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "unity": "6000.0",
   "description": "Build Unity uGUI prefabs from Figma node data and a declarative prefab hierarchy, with TextMeshPro styling and automatic sprite download and caching.",
   "author": {
@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "com.beddup.figmaclient": "0.0.1",
-    "com.beddup.figmatmpstyler": "0.0.1",
+    "com.beddup.figmatmpstyler": "0.0.2",
     "com.unity.textmeshpro": "3.0.9"
   },
   "keywords": [

@@ -68,6 +68,7 @@ namespace FigmaImporter.Editor
             GUI.backgroundColor = canGenerate ? new UnityEngine.Color(0.4f, 0.8f, 0.4f) : UnityEngine.Color.white;
             if (GUILayout.Button("Generate Selected Pages", GUILayout.Height(36)))
             {
+                FigmaImagesLocalPool.LoadPool().RemoveInvalidItems();
                 var toGenerate = new List<FigmaPrefabResult>();
                 foreach (var idx in selectedIndices)
                 {
