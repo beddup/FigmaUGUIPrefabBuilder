@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using FigmaClient;
+using FigmaClient.Editor;
 
 namespace FigmaImporter.Editor
 {

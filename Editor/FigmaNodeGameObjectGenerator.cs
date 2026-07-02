@@ -2,8 +2,8 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using FigmaClient;
-using Figma.TMPStyler.Editor;
+using FigmaClient.Editor;
+using FigmaTMPStyler.Editor;
 
 
 namespace FigmaImporter.Editor

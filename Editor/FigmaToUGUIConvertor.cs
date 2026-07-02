@@ -3,7 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Linq;
 using System.Threading.Tasks;
-using FigmaClient;
+using FigmaClient.Editor;
 
 namespace FigmaImporter.Editor
 {

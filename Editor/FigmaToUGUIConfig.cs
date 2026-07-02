@@ -4,7 +4,7 @@ using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEditor;
-using FigmaClient;
+using FigmaClient.Editor;
 
 namespace FigmaImporter.Editor
 {

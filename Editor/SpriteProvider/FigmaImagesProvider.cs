@@ -5,7 +5,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEditor;
 using System.Threading.Tasks;
-using FigmaClient;
+using FigmaClient.Editor;
 
 namespace FigmaImporter.Editor
 {
