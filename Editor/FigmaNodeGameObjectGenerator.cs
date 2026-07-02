@@ -211,7 +211,7 @@ namespace FigmaImporter.Editor
             switch (fills[0].renderType)
             {
                 case Fill.FillRenderType.Color:
-                    tmpText.color = fill.FillColor();
+                    tmpText.color = contentNode.opacity * fill.FillColor();
                     break;
                 case Fill.FillRenderType.GRADIENT:
                     var preset = TMPColorGradientResolver.GetTextGradientColorPreset(fill, materialSaveFolder);

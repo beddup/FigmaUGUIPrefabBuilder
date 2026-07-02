@@ -1,4 +1,8 @@
 # Changelog
+## [0.0.6] - 2026-07-02
+### Fixed
+- Text color now correctly applies node opacity
+
 ## [0.0.5] - 2026-07-02
 - Registered on OpenUPM
 
