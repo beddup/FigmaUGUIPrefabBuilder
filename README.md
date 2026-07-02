@@ -31,20 +31,13 @@ It creates the GameObject hierarchy, reconstructs layout with `RectTransform`, a
 
 ## Installation
 
+Install [OpenUPM CLI](https://openupm.com/docs/getting-started.html), then run:
 
-Add these lines to your project's `Packages/manifest.json`:
-
-```json
-{
-  "dependencies": {
-     "com.beddup.figmatmpstyler": "https://github.com/beddup/figmatmpstyler.git", 
-     "com.beddup.figmaclient": "https://github.com/beddup/figmaclient.git",
-     "com.beddup.figma-ugui-prefab-builder":"https://github.com/beddup/FigmaUGUIPrefabBuilder.git"
-  }
-}
+```bash
+openupm add com.beddup.figma-ugui-prefab-builder
 ```
 
-You can also download the source code directly and import it into your Unity project.
+or You can also download the source code directly and import it into your Unity project.
 
 ## Quick start
 
