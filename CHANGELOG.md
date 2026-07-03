@@ -1,4 +1,8 @@
 # Changelog
+## [0.1.0] - 2026-07-03
+### Added
+- Component attachment support on text nodes
+
 ## [0.0.6] - 2026-07-02
 ### Fixed
 - Text color now correctly applies node opacity
