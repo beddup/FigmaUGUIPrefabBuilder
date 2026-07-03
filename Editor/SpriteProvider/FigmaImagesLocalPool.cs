@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using Color = UnityEngine.Color;
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     public class FigmaImagesLocalPool : ScriptableObject
     {

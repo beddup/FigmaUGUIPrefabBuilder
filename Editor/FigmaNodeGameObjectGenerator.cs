@@ -6,7 +6,7 @@ using FigmaClient.Editor;
 using FigmaTMPStyler.Editor;
 
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     public class FigmaNodeGameObjectGenerator
     {

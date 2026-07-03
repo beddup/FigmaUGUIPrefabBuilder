@@ -7,7 +7,7 @@ using UnityEditor;
 using System.Threading.Tasks;
 using FigmaClient.Editor;
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     public class FigmaImagesProvider
     {

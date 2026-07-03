@@ -6,13 +6,15 @@ using UnityEngine;
 using UnityEditor;
 using FigmaClient.Editor;
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     
     [Serializable]
     public class FigmaPrefabResult
     {
+        public string figma_url;
         public string file_key;
+        public string node_id;
         public string node_name;
         public string raw_content_path;
         public string prefab_hierarchy_path;
@@ -46,7 +48,7 @@ namespace FigmaImporter.Editor
             EditorGUILayout.LabelField("Generate Prefab", EditorStyles.boldLabel);
 
             if (isGenerating) EditorGUILayout.HelpBox("A prefab generation is already in progress. Please wait…", MessageType.Warning);
-
+            
             // ── 重新渲染 FigmaPages，每项带 checkbox ──
             for (int i = 0; i < config.FigmaPages.Length; i++)
             {
@@ -107,9 +109,7 @@ namespace FigmaImporter.Editor
                     {
                         EditorUtility.DisplayProgressBar("Generating Prefabs",  $"({i + 1}/{results.Count}) {r.node_name}…",(float)i / results.Count);
 
-                        string raw = File.ReadAllText(r.raw_content_path);
-                        string hierarchy = File.ReadAllText(r.prefab_hierarchy_path);
-                        await FigmaToUGUIConvertor.ConvertFigmaToUGUIPrefab(config, r.file_key, config.FigmaAPIToken, raw, hierarchy);
+                        await FigmaToUGUIConvertor.ConvertFigmaToUGUIPrefab(config, config.FigmaAPIToken, r);
                         succeeded++;
                     }
                     catch (Exception ex)

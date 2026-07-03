@@ -4,13 +4,20 @@ using UnityEngine;
 using System.Linq;
 using System.Threading.Tasks;
 using FigmaClient.Editor;
+using FigmaTMPStyler.Editor;
+using FigmaTMPStyler;
+using System.IO;
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     public class FigmaToUGUIConvertor
     {
-        public static async Task ConvertFigmaToUGUIPrefab(FigmaToUGUIConfig config, string fileKey, string figmaToken, string figmaRawContent, string prefabHierarchy)
+        public static async Task ConvertFigmaToUGUIPrefab(FigmaToUGUIConfig config, string figmaToken, FigmaPrefabResult figmaPrefabResult)
         {
+            string figmaRawContent = File.ReadAllText(figmaPrefabResult.raw_content_path);
+            string prefabHierarchy = File.ReadAllText(figmaPrefabResult.prefab_hierarchy_path);
+            string fileKey = figmaPrefabResult.file_key;
+            
             var hierarchyRoot = UGUIPrefabNode.FromJson(prefabHierarchy);
             var rootNode = new FigmaNodeParser().ParseNode<Node>(figmaRawContent);
             UGUIPrefabNode.BindNode(hierarchyRoot, rootNode);
@@ -75,6 +82,10 @@ namespace FigmaImporter.Editor
                     var tmpFont = config.GetFont(node);
 
                     generator.AddText(node, gameObject, tmpFont, config.MaterialSaveFolder, hierarchyNode.text_alignment);
+                    var matGenerator = gameObject.AddComponent<FigmaTextTMPMaterialGenerator>();
+                    matGenerator.FigmaToken = figmaToken;
+                    matGenerator.MaterialSavePath = config.MaterialSaveFolder;
+                    matGenerator.NodeLink = figmaPrefabResult.figma_url.Replace(figmaPrefabResult.node_id, node.id);
                 }
 
                 if (hierarchyNode.isButton)

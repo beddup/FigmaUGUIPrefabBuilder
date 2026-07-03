@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FigmaClient.Editor;
 
-namespace FigmaImporter.Editor
+namespace FigmaToUGUIPrefab.Editor
 {
     public enum NodeRenderType
     {

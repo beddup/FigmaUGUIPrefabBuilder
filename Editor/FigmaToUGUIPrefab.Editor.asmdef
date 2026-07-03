@@ -1,10 +1,11 @@
 {
-    "name": "Figma.ToUGUI.Editor",
-    "rootNamespace": "",
+    "name": "FigmaToUGUIPrefab.Editor",
+    "rootNamespace": "FigmaToUGUIPrefab.Editor",
     "references": [
         "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:3a6d07ad1604540e0afae9b800bc4300",
-        "GUID:dc11f17208bd843ab85c32266ad7df7c"
+        "GUID:dc11f17208bd843ab85c32266ad7df7c",
+        "GUID:01016136958af41a09b5250ea7f9b52b"
     ],
     "includePlatforms": [
         "Editor"
