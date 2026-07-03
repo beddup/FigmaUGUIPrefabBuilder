@@ -1,5 +1,6 @@
 ﻿using System;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using FigmaClient.Editor;
@@ -253,7 +254,29 @@ namespace FigmaToUGUIPrefab.Editor
 
                 // 根据 image_type 设置 Image 组件的填充类型
                 if (string.Equals(hierarchyNode.image_type, "sliced", StringComparison.InvariantCultureIgnoreCase))
+                {
                     image.type = Image.Type.Sliced;
+
+                    // 如果 sprite 没有 border，自动设置 9-slice border
+                    if (sprite.border == Vector4.zero)
+                    {
+                        float w = sprite.rect.width;
+                        float h = sprite.rect.height;
+                        if (w > 0 && h > 0)
+                        {
+                            var spritePath = AssetDatabase.GetAssetPath(sprite);
+                            var importer = AssetImporter.GetAtPath(spritePath) as TextureImporter;
+                            if (importer != null)
+                            {
+                                float borderX = Mathf.Round(w * 7f / 16f);
+                                float borderY = Mathf.Round(h * 7f / 16f);
+                                importer.spriteBorder = new Vector4(borderX, borderY, borderX, borderY);
+                                importer.SaveAndReimport();
+                                image.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                            }
+                        }
+                    }
+                }
                 else if (string.Equals(hierarchyNode.image_type, "tiled", StringComparison.InvariantCultureIgnoreCase))
                     image.type = Image.Type.Tiled;
 

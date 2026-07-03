@@ -169,10 +169,8 @@ namespace FigmaToUGUIPrefab.Editor
             textureImporter.textureType = TextureImporterType.Sprite;
             textureImporter.spriteImportMode = SpriteImportMode.Single;
 
-            // 为 sliced / tiled 类型的图片设置 9-slice border
-            if (prefabNode != null &&
-                (string.Equals(prefabNode.image_type, "sliced", StringComparison.InvariantCultureIgnoreCase) ||
-                 string.Equals(prefabNode.image_type, "tiled", StringComparison.InvariantCultureIgnoreCase)))
+            // 为 sliced  类型的图片设置 9-slice border
+            if (prefabNode != null && string.Equals(prefabNode.image_type, "sliced", StringComparison.InvariantCultureIgnoreCase))
             {
                 var tempTex = new Texture2D(1, 1);
                 tempTex.LoadImage(data);
