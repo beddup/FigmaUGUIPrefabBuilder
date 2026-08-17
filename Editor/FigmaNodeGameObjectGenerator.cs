@@ -170,7 +170,7 @@ namespace FigmaToUGUIPrefab.Editor
             tmpText.fontSize = style.fontSize;
 
 
-            tmpText.fontMaterial = matInfo.OutlineAndDropShadow ?? (matInfo.InnerShadow ?? tmpText.font.material);
+            tmpText.fontMaterial = matInfo.Materials[0];
 
             // alignment：优先使用 hierarchy 数据中的 text_alignment，否则使用 Figma style
             string verticalAlignment;
@@ -223,18 +223,19 @@ namespace FigmaToUGUIPrefab.Editor
                     Debug.LogError($"[Figma Importer] do not support fill type {fills[0].renderType} in Text node {contentNode.name}({contentNode.id}");
                     break;
             }
-            
-            if (matInfo.OutlineAndDropShadow != null && matInfo.InnerShadow != null) // need to create extra gameobject for innershadow
+
+            for (int i = 1; i < matInfo.Materials.Count; i++)
             {
                 // 同时有 outline/dropShadow 和 innerShadow，需要 clone 承载第二个材质
                 var innerShadowText = GameObject.Instantiate(nodeGo, nodeGo.transform).GetComponent<TextMeshProUGUI>();
-                innerShadowText.gameObject.name = $"{nodeGo.name} innershadow";
-                innerShadowText.fontMaterial = matInfo.InnerShadow;
+                innerShadowText.gameObject.name = $"{nodeGo.name} figma_attached";
+                innerShadowText.fontMaterial = matInfo.Materials[i];
                 (innerShadowText.transform as RectTransform).anchorMin = Vector2.zero;
                 (innerShadowText.transform as RectTransform).anchorMax = Vector2.one;
                 (innerShadowText.transform as RectTransform).offsetMin = Vector2.zero;
                 (innerShadowText.transform as RectTransform).offsetMax = Vector2.zero;
             }
+
         }
 
         /// <summary>

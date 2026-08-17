@@ -1,4 +1,12 @@
 # Changelog
+## [0.2.0] - 2026-08-17
+### Added
+- Auto 9-slice border for sliced images with no border
+- Multi drop-shadow / inner-shadow support via cloned child TextMeshProUGUI objects
+
+### Changed
+- Bumped `com.beddup.figmatmpstyler` dependency to 0.1.0 (multi-material API)
+
 ## [0.1.0] - 2026-07-03
 ### Added
 - Component attachment support on text nodes
