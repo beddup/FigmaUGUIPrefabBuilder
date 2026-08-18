@@ -1,4 +1,8 @@
 # Changelog
+## [0.2.1] - 2026-08-18
+### Fixed
+- Inner-shadow attached text clones are now re-parented with correct local scale, position, and anchors
+
 ## [0.2.0] - 2026-08-17
 ### Added
 - Auto 9-slice border for sliced images with no border

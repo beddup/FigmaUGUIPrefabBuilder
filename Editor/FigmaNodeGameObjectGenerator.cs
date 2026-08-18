@@ -5,7 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using FigmaClient.Editor;
 using FigmaTMPStyler.Editor;
-
+using System.Collections.Generic;
+using Object = System.Object;
 
 namespace FigmaToUGUIPrefab.Editor
 {
@@ -224,18 +225,26 @@ namespace FigmaToUGUIPrefab.Editor
                     break;
             }
 
+            List<RectTransform> attachedTexts = new List<RectTransform>();
             for (int i = 1; i < matInfo.Materials.Count; i++)
             {
-                // 同时有 outline/dropShadow 和 innerShadow，需要 clone 承载第二个材质
-                var innerShadowText = GameObject.Instantiate(nodeGo, nodeGo.transform).GetComponent<TextMeshProUGUI>();
-                innerShadowText.gameObject.name = $"{nodeGo.name} figma_attached";
-                innerShadowText.fontMaterial = matInfo.Materials[i];
-                (innerShadowText.transform as RectTransform).anchorMin = Vector2.zero;
-                (innerShadowText.transform as RectTransform).anchorMax = Vector2.one;
-                (innerShadowText.transform as RectTransform).offsetMin = Vector2.zero;
-                (innerShadowText.transform as RectTransform).offsetMax = Vector2.zero;
+                var generator = UnityEngine.Object.Instantiate(nodeGo);
+                var text = generator.GetComponent<TextMeshProUGUI>();
+                text.gameObject.name = $"{nodeGo.name} figma_attached";
+                text.fontMaterial = matInfo.Materials[i];
+                attachedTexts.Add(text.transform as RectTransform);
             }
 
+            foreach (var text in attachedTexts)
+            {
+                text.SetParent(nodeGo.transform);
+                text.localScale = Vector3.one;
+                text.position = nodeGo.transform.position;
+                text.anchorMin = Vector2.zero;
+                text.anchorMax = Vector2.one;
+                text.offsetMin = Vector2.zero;
+                text.offsetMax = Vector2.zero;
+            }
         }
 
         /// <summary>
