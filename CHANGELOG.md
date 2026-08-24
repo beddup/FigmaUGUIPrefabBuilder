@@ -1,4 +1,8 @@
 # Changelog
+## [0.2.2] - 2026-08-24
+### Fixed
+- Applying a Figma font size now also sets `fontSizeMax`, so auto-sizing text honors the Figma size
+
 ## [0.2.1] - 2026-08-18
 ### Fixed
 - Inner-shadow attached text clones are now re-parented with correct local scale, position, and anchors

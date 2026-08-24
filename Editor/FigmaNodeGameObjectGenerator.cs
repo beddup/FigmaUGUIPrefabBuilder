@@ -169,7 +169,7 @@ namespace FigmaToUGUIPrefab.Editor
 
             tmpText.font = matInfo.Font;
             tmpText.fontSize = style.fontSize;
-
+            tmpText.fontSizeMax = style.fontSize;
 
             tmpText.fontMaterial = matInfo.Materials[0];
 
