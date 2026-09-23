@@ -136,6 +136,7 @@ namespace FigmaToUGUIPrefab.Editor
         [Serializable]
         public class FigmaFontItem
         {
+            [Header("Font Family")]
             public string Name;
             public int Weight;
             [Header("字体粗细, 如 Regular，SemiBold等")]
@@ -157,10 +158,9 @@ namespace FigmaToUGUIPrefab.Editor
             
             var fontItem = FontItems.Find(item =>
             {
-                if (item.Weight != style.fontWeight) return false;
-                if (!item.Name.Equals(style.fontFamily, StringComparison.InvariantCultureIgnoreCase)) return false;
-                if (string.IsNullOrEmpty(style.fontPostScriptName) && string.IsNullOrEmpty(item.Style)) return true;
-                return style.fontPostScriptName.Contains(item.Style, StringComparison.InvariantCultureIgnoreCase);
+                return item.Name.Equals(style.fontFamily, StringComparison.InvariantCultureIgnoreCase) &&
+                       item.Weight == style.fontWeight && 
+                       item.Style.Equals(style.fontStyle, StringComparison.InvariantCultureIgnoreCase);
             });
             if (fontItem == null)
             {

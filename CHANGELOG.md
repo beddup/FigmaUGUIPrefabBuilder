@@ -1,4 +1,11 @@
 # Changelog
+## [0.2.3] - 2026-09-23
+### Changed
+- Bumped `com.beddup.figmaclient` dependency to 0.0.3
+
+### Fixed
+- Font matching now compares `Name`, `Weight` and `Style` against the node's `fontStyle`, replacing the previous `fontPostScriptName`-based heuristic
+
 ## [0.2.2] - 2026-08-24
 ### Fixed
 - Applying a Figma font size now also sets `fontSizeMax`, so auto-sizing text honors the Figma size
